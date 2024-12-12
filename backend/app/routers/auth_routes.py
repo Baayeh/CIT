@@ -4,7 +4,7 @@ from app.db.database import SessionDep
 from app.schemas.auth_schema import UserCreateSchema, UserDetailSchema
 from app.services.auth_service import AuthService
 
-router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+router = APIRouter()
 service = AuthService()
 
 

@@ -32,7 +32,7 @@ class AuthService:
         if user_exists:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"User with email {user_data.email} already exists",
+                detail="User with email already exists",
             )
 
         user_data_dict = user_data.model_dump()

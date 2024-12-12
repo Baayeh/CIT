@@ -19,5 +19,7 @@ version = "v1"
 
 app = FastAPI(version=version, lifespan=lifespan)
 
-app.include_router(customer_routes.router)
-app.include_router(auth_routes.router)
+app.include_router(
+    customer_routes.router, prefix=f"/api/{version}/customers", tags=["customers"]
+)
+app.include_router(auth_routes.router, prefix=f"/api/{version}/auth", tags=["auth"])

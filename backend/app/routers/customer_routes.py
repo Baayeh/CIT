@@ -8,7 +8,7 @@ from app.services.customer_service import CustomerService
 
 # from app.utils import is_valid_uuid
 
-router = APIRouter(prefix="/api/v1/customers", tags=["customers"])
+router = APIRouter()
 service = CustomerService()
 
 
