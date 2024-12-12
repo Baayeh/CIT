@@ -7,3 +7,5 @@ backend/venv
 # Python cache files
 backend/app/__pycache__/
 backend/app/*/__pycache__/
+backend/migrations/__pycache__/
+backend/migrations/*/__pycache__/
