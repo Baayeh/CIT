@@ -1,7 +1,6 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-# import sqlalchemy.dialects.postgresql as pg
 from sqlmodel import Field, SQLModel
 
 
