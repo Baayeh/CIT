@@ -3,9 +3,10 @@ from logging.config import fileConfig
 from alembic import context
 from app.core.config import get_settings
 from app.models.customer_model import Customer  # noqa: F401
-from app.models.user_model import User  # noqa: F401
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
+
+from backend.app.models.auth_model import User  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
