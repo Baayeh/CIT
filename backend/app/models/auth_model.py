@@ -14,7 +14,7 @@ class User(SQLModel, table=True):
     firstname: str
     lastname: str
     password_hash: str = Field(exclude=True)
-    is_verified: bool = Field(default=True)
+    is_verified: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
