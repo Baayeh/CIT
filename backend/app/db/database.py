@@ -6,6 +6,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import get_settings
 from app.models.customer_model import Customer  # noqa: F401
+from app.models.user_model import User  # noqa: F401
 
 settings = get_settings()
 
