@@ -16,8 +16,14 @@ class DB(BaseModel):
     name: str = os.getenv("DB_NAME")
 
 
+class JWTSettings(BaseModel):
+    secret: str = os.getenv("JWT_SECRET")
+    algo: str = os.getenv("JWT_ALGO")
+
+
 class Settings(BaseSettings):
     db: DB = DB()
+    JWT: JWTSettings = JWTSettings()
 
     model_config = SettingsConfigDict(env_nested_delimiter="__", extra="ignore")
 
