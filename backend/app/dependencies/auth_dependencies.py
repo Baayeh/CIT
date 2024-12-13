@@ -1,5 +1,8 @@
+from typing import List
+
 from app.db.database import SessionDep
 from app.db.redis import token_in_blocklist
+from app.models.auth_model import User
 from app.services.auth_service import AuthService
 from app.utils.auth_utils import decode_token
 from fastapi import Depends, Request, status
@@ -88,3 +91,16 @@ def get_current_user(
     user = service.get_user_by_email(user_email, session)
 
     return user
+
+
+class RoleChecker:
+    def __init__(self, allowed_roles: List[str]) -> None:
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, current_user: User = Depends(get_current_user)):
+        if current_user.role in self.allowed_roles:
+            return True
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to access this endpoint",
+        )
