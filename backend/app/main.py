@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
 
 version = "v1"
 
-app = FastAPI(version=version, lifespan=lifespan)
+app = FastAPI(version=version)
 
 app.include_router(
     customer_routes.router, prefix=f"/api/{version}/customers", tags=["customers"]

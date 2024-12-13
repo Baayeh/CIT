@@ -8,6 +8,7 @@ from app.db.redis import add_jti_to_blocklist
 from app.dependencies.auth_dependencies import (
     AccessTokenBearer,
     RefreshTokenBearer,
+    RoleChecker,
     get_current_user,
 )
 from app.schemas.auth_schema import UserCreateSchema, UserDetailSchema, UserLoginSchema
@@ -16,6 +17,7 @@ from app.utils.auth_utils import create_access_token, verify_passwd
 
 router = APIRouter()
 service = AuthService()
+role_checker = RoleChecker(["admin", "user"])
 
 REFRESH_TOKEN_EXPIRY = 2
 
@@ -53,11 +55,25 @@ async def login_user(login_data: UserLoginSchema, session: SessionDep):
 
     # Generate access and refresh tokens
     access_token = create_access_token(
-        user_data={"email": user.email, "user_id": str(user.id)}
+        user_data={
+            "user_id": str(user.id),
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+        }
     )
 
     refresh_token = create_access_token(
-        user_data={"email": user.email, "user_id": str(user.id)},
+        user_data={
+            "user_id": str(user.id),
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+        },
         refresh=True,
         expiry=timedelta(days=REFRESH_TOKEN_EXPIRY),
     )
@@ -68,7 +84,14 @@ async def login_user(login_data: UserLoginSchema, session: SessionDep):
             "message": "Login successful",
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "user": {"email": user.email, "id": str(user.id)},
+            "user": {
+                "user_id": str(user.id),
+                "firstname": user.firstname,
+                "lastname": user.lastname,
+                "username": user.username,
+                "email": user.email,
+                "role": user.role,
+            },
         }
     )
 
@@ -89,7 +112,9 @@ async def get_new_access_token(token_details: dict = RefreshTokenDep):
 
 
 @router.get("/me")
-async def get_current_user(user=Depends(get_current_user)):
+async def get_current_user(
+    user=Depends(get_current_user), _: bool = Depends(role_checker)
+):
     return user
 
 
