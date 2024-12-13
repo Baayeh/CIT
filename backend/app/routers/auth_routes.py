@@ -4,7 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from app.db.database import SessionDep
-from app.dependencies.auth_dependencies import RefreshTokenBearer
+from app.db.redis import add_jti_to_blocklist
+from app.dependencies.auth_dependencies import (
+    AccessTokenBearer,
+    RefreshTokenBearer,
+    get_current_user,
+)
 from app.schemas.auth_schema import UserCreateSchema, UserDetailSchema, UserLoginSchema
 from app.services.auth_service import AuthService
 from app.utils.auth_utils import create_access_token, verify_passwd
@@ -14,7 +19,8 @@ service = AuthService()
 
 REFRESH_TOKEN_EXPIRY = 2
 
-TokenDep = Depends(RefreshTokenBearer())
+AccessTokenDep = Depends(AccessTokenBearer())
+RefreshTokenDep = Depends(RefreshTokenBearer())
 
 
 @router.post(
@@ -62,7 +68,7 @@ async def login_user(login_data: UserLoginSchema, session: SessionDep):
 
 
 @router.get("/refresh_token")
-async def get_new_access_token(token_details: dict = TokenDep):
+async def get_new_access_token(token_details: dict = RefreshTokenDep):
     """Get New Access Token using the refresh token"""
 
     expiry_timestamp = token_details["exp"]
@@ -73,4 +79,20 @@ async def get_new_access_token(token_details: dict = TokenDep):
         return JSONResponse(content={"access_token": new_access_token})
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
+    )
+
+
+@router.get("/me")
+async def get_current_user(user=Depends(get_current_user)):
+    return user
+
+
+@router.get("/logout")
+async def revoke_token(token_details: dict = AccessTokenDep):
+    jti = token_details["jti"]
+
+    await add_jti_to_blocklist(jti)
+
+    return JSONResponse(
+        content={"message": "Logged out successfully"}, status_code=status.HTTP_200_OK
     )
