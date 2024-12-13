@@ -1,17 +1,20 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from app.db.database import SessionDep
+from app.dependencies.auth_dependencies import RefreshTokenBearer
 from app.schemas.auth_schema import UserCreateSchema, UserDetailSchema, UserLoginSchema
 from app.services.auth_service import AuthService
-from app.utils.auth_utils import create_access_token, decode_token, verify_passwd
+from app.utils.auth_utils import create_access_token, verify_passwd
 
 router = APIRouter()
 service = AuthService()
 
 REFRESH_TOKEN_EXPIRY = 2
+
+TokenDep = Depends(RefreshTokenBearer())
 
 
 @router.post(
@@ -55,4 +58,19 @@ async def login_user(login_data: UserLoginSchema, session: SessionDep):
 
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN, detail="Invalid email or password"
+    )
+
+
+@router.get("/refresh_token")
+async def get_new_access_token(token_details: dict = TokenDep):
+    """Get New Access Token using the refresh token"""
+
+    expiry_timestamp = token_details["exp"]
+
+    if datetime.fromtimestamp(expiry_timestamp) > datetime.now():
+        new_access_token = create_access_token(user_data=token_details["user"])
+
+        return JSONResponse(content={"access_token": new_access_token})
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
     )
