@@ -37,33 +37,39 @@ async def login_user(login_data: UserLoginSchema, session: SessionDep):
     email = login_data.email
     password = login_data.password
 
+    # Attempt to retrieve the user from the database
     user = service.get_user_by_email(email, session)
 
-    if user is not None:
-        password_valid = verify_passwd(password, user.password_hash)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid email or password"
+        )
 
-        if password_valid:
-            access_token = create_access_token(
-                user_data={"email": user.email, "user_id": str(user.id)}
-            )
+    # Validate the password
+    if not verify_passwd(password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid email or password"
+        )
 
-            refresh_token = create_access_token(
-                user_data={"email": user.email, "user_id": str(user.id)},
-                refresh=True,
-                expiry=timedelta(days=REFRESH_TOKEN_EXPIRY),
-            )
+    # Generate access and refresh tokens
+    access_token = create_access_token(
+        user_data={"email": user.email, "user_id": str(user.id)}
+    )
 
-            return JSONResponse(
-                content={
-                    "message": "Login successful",
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "user": {"email": user.email, "id": str(user.id)},
-                }
-            )
+    refresh_token = create_access_token(
+        user_data={"email": user.email, "user_id": str(user.id)},
+        refresh=True,
+        expiry=timedelta(days=REFRESH_TOKEN_EXPIRY),
+    )
 
-    raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, detail="Invalid email or password"
+    # Return a successful response with tokens and user info
+    return JSONResponse(
+        content={
+            "message": "Login successful",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "user": {"email": user.email, "id": str(user.id)},
+        }
     )
 
 
