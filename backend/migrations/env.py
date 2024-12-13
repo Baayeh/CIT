@@ -4,6 +4,7 @@ from alembic import context
 from app.core.config import get_settings
 from app.models.auth_model import User  # noqa: F401
 from app.models.customer_model import Customer  # noqa: F401
+from app.models.ticket_model import Ticket  # noqa: F401
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
