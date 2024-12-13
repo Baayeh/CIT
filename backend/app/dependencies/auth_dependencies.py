@@ -1,3 +1,4 @@
+from app.db.redis import token_in_blocklist
 from app.utils.auth_utils import decode_token
 from fastapi import Request, status
 from fastapi.exceptions import HTTPException
@@ -19,6 +20,15 @@ class TokenBearer(HTTPBearer):
 
         # Decode and validate the token
         token_data = self.is_token_valid(token)
+
+        if await token_in_blocklist(token_data["jti"]):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "error": "This token is invalid or has been revoked",
+                    "resolution": "Please get new token",
+                },
+            )
 
         self.verify_token_data(token_data)
 
