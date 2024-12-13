@@ -8,7 +8,7 @@ from app.utils.auth_utils import generate_passwd_hash
 
 class AuthService:
     def get_user_by_email(self, email: str, session: Session):
-        """Get user from DB using the email"""
+        """Get user from DB using either the email."""
         statement = select(User).where(User.email == email)
         user = session.exec(statement).first()
 
@@ -23,8 +23,11 @@ class AuthService:
     def user_exists(self, email: str, session: Session):
         """Check if user already exists"""
 
-        statement = select(User).where(User.email == email)
-        return session.exec(statement).first() is not None
+        try:
+            self.get_user_by_email(email, session)
+            return True  # If no exception is raised, the user exists
+        except HTTPException:
+            return False  # User not found
 
     def create_user(self, user_data: UserCreateSchema, session: Session):
         user_exists = self.user_exists(user_data.email, session)
