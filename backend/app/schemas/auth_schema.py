@@ -21,3 +21,12 @@ class UserCreateSchema(BaseModel):
     username: str = Field(min_length=5, max_length=25)
     email: EmailStr
     password: str = Field(min_length=8)
+
+    model_config = {"extra": "forbid"} 
+
+
+class UserLoginSchema(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+
+    model_config = {"extra": "forbid"}
