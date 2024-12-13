@@ -12,9 +12,7 @@ from app.services.customer_service import CustomerService
 router = APIRouter()
 service = CustomerService()
 
-access_token_bearer = AccessTokenBearer()
-
-TokenDep = Depends(access_token_bearer)
+TokenDep = Depends(AccessTokenBearer())
 
 
 @router.get(
