@@ -9,6 +9,7 @@ class UserDetailSchema(BaseModel):
     firstname: str
     lastname: str
     username: str
+    role: str
     email: EmailStr
     is_verified: bool
     created_at: datetime
@@ -22,7 +23,7 @@ class UserCreateSchema(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
 
-    model_config = {"extra": "forbid"} 
+    model_config = {"extra": "forbid"}
 
 
 class UserLoginSchema(BaseModel):
