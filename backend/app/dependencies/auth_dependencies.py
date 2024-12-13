@@ -1,8 +1,12 @@
+from app.db.database import SessionDep
 from app.db.redis import token_in_blocklist
+from app.services.auth_service import AuthService
 from app.utils.auth_utils import decode_token
-from fastapi import Request, status
+from fastapi import Depends, Request, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+service = AuthService()
 
 
 class TokenBearer(HTTPBearer):
@@ -72,3 +76,15 @@ class RefreshTokenBearer(TokenBearer):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Please provide a refresh token",
             )
+
+
+def get_current_user(
+    session: SessionDep, token_details: dict = Depends(AccessTokenBearer())
+):
+    """Get current logged in user"""
+
+    user_email = token_details["user"]["email"]
+
+    user = service.get_user_by_email(user_email, session)
+
+    return user
