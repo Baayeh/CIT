@@ -9,28 +9,40 @@ class TokenBearer(HTTPBearer):
         super().__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
+        """
+        Validate the token and return its decoded data.
+        """
+
         credentials = await super().__call__(request)
 
         token = credentials.credentials
 
-        token_data = decode_token(token)
+        # Decode and validate the token
+        token_data = self.is_token_valid(token)
 
-        if not self.is_token_valid(token):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token"
-            )
         self.verify_token_data(token_data)
 
         return token_data
 
-    def is_token_valid(self, token: str) -> bool:
-        """Check if the token credentials are valid"""
+    def is_token_valid(self, token: str) -> dict:
+        """
+        Decode the token safely and return its data if valid.
+        Raise appropriate HTTP exceptions for known issues.
+        """
 
         token_data = decode_token(token)
 
-        return True if token_data is not None else False
+        if token_data is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token"
+            )
+        return token_data
 
     def verify_token_data(self, token_data):
+        """
+        Verify the structure or claims of the token.
+        This method must be implemented in subclasses for custom logic.
+        """
         raise NotImplementedError("Please overide this method in child class")
 
 
