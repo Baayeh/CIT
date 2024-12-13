@@ -48,11 +48,29 @@ def create_access_token(
 
 
 def decode_token(token: str) -> dict:
+    """
+    Decodes a JWT token and returns the payload as a dictionary.
+    Handles specific exceptions to provide more detailed error handling.
+    """
     try:
+        # Attempt to decode the token
         token_data = jwt.decode(
             jwt=token, key=settings.JWT.secret, algorithms=[settings.JWT.algo]
         )
         return token_data
+    except jwt.ExpiredSignatureError:
+        # Token has expired
+        logging.warning("Token has expired.")
+        return None
+    except jwt.InvalidTokenError:
+        # Token is invalid (e.g., bad signature, malformed token)
+        logging.error("Invalid token.")
+        return None
     except jwt.PyJWKError as e:
-        logging.exception(e)
+        # Key management or decoding issue
+        logging.exception(f"Token decoding failed due to JWK error: {e}")
+        return None
+    except Exception as e:
+        # Unexpected error (safeguard)
+        logging.exception(f"Unexpected error during token decoding: {e}")
         return None
