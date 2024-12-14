@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
 
-from .ticket_schema import TicketDetailSchema
+from ..tickets.ticket_schema import TicketDetailSchema
 
 
 class UserDetailSchema(BaseModel):

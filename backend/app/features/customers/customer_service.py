@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, desc, select
 
-from app.models.customer_model import Customer
-from app.schemas.customer_schema import CustomerCreateSchema, CustomerUpdateSchema
+from .customer_model import Customer
+from .customer_schema import CustomerCreateSchema, CustomerUpdateSchema
 
 
 class CustomerService:

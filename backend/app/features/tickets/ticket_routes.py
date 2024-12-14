@@ -3,13 +3,14 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.db.database import SessionDep
-from app.dependencies.auth_dependencies import AccessTokenBearer, RoleChecker
-from app.schemas.ticket_schema import (
+from app.features.auth.auth_dependencies import AccessTokenBearer, RoleChecker
+
+from .ticket_schema import (
     TicketCreateSchema,
     TicketDetailSchema,
     TicketUpdateSchema,
 )
-from app.services.ticket_service import TicketService
+from .ticket_service import TicketService
 
 # role checkers
 universal_checker = Depends(RoleChecker(["admin", "user"]))

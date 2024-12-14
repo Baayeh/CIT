@@ -3,7 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.db.database import engine, init_db
-from app.routers import auth_routes, customer_routes, ticket_routes
+from app.features.auth import auth_routes
+from app.features.customers import customer_routes
+from app.features.tickets import ticket_routes
 
 
 @asynccontextmanager

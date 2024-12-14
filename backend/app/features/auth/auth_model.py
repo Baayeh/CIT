@@ -6,7 +6,7 @@ import sqlalchemy.dialects.postgresql as pg
 from pydantic import EmailStr
 from sqlmodel import Column, Field, Relationship, SQLModel
 
-from app.models import ticket_model
+from app.features.tickets import ticket_model
 
 
 class User(SQLModel, table=True):
@@ -31,7 +31,9 @@ class User(SQLModel, table=True):
         sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now)
     )
     tickets: List["ticket_model.Ticket"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
+        back_populates="user",
+        cascade_delete=True,
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
     def __repr__(self):

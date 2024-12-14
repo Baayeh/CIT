@@ -5,15 +5,20 @@ from fastapi.responses import JSONResponse
 
 from app.db.database import SessionDep
 from app.db.redis import add_jti_to_blocklist
-from app.dependencies.auth_dependencies import (
+
+from .auth_dependencies import (
     AccessTokenBearer,
     RefreshTokenBearer,
     RoleChecker,
     get_current_user,
 )
-from app.schemas.auth_schema import UserCreateSchema, UserDetailSchema, UserLoginSchema
-from app.services.auth_service import AuthService
-from app.utils.auth_utils import create_access_token, verify_passwd
+from .auth_schema import (
+    UserCreateSchema,
+    UserDetailSchema,
+    UserLoginSchema,
+)
+from .auth_service import AuthService
+from .auth_utils import create_access_token, verify_passwd
 
 router = APIRouter()
 service = AuthService()

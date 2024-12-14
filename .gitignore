@@ -9,3 +9,5 @@ backend/app/__pycache__/
 backend/app/*/__pycache__/
 backend/migrations/__pycache__/
 backend/migrations/*/__pycache__/
+backend/app/features/__pycache__/
+backend/app/features/*/__pycache__/

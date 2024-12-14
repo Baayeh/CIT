@@ -3,9 +3,9 @@ import logging
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from app.models.auth_model import User
-from app.schemas.auth_schema import UserCreateSchema
-from app.utils.auth_utils import generate_passwd_hash
+from app.features.auth.auth_model import User
+from app.features.auth.auth_schema import UserCreateSchema
+from app.features.auth.auth_utils import generate_passwd_hash
 
 
 class AuthService:
