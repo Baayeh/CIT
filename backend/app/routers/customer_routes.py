@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, status
 
 from app.db.database import SessionDep
 from app.dependencies.auth_dependencies import AccessTokenBearer, RoleChecker
-from app.schemas.customer_schema import CustomerCreateSchema, CustomerDetailsSchema
+from app.schemas.customer_schema import (
+    CustomerCreateSchema,
+    CustomerDetailsSchema,
+    CustomerUpdateSchema,
+)
 from app.services.customer_service import CustomerService
 
 # role checkers
@@ -72,7 +76,7 @@ async def get_customer(
 )
 async def update_customer(
     customer_id: str,
-    customer_data: CustomerCreateSchema,
+    customer_data: CustomerUpdateSchema,
     session: SessionDep,
     token_details=TokenDep,
 ):
