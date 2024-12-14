@@ -111,7 +111,7 @@ async def get_new_access_token(token_details: dict = RefreshTokenDep):
     )
 
 
-@router.get("/me")
+@router.get("/me", response_model=UserDetailSchema)
 async def get_current_user(
     user=Depends(get_current_user), _: bool = Depends(role_checker)
 ):
