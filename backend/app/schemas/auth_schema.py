@@ -1,7 +1,10 @@
 from datetime import datetime
+from typing import List
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
+
+from .ticket_schema import TicketDetailSchema
 
 
 class UserDetailSchema(BaseModel):
@@ -14,6 +17,7 @@ class UserDetailSchema(BaseModel):
     is_verified: bool
     created_at: datetime
     updated_at: datetime
+    tickets: List[TicketDetailSchema]
 
 
 class UserCreateSchema(BaseModel):
