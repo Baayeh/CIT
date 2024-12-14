@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, desc, select
 
-from app.models.ticket_model import Ticket
-from app.schemas.ticket_schema import TicketCreateSchema, TicketUpdateSchema
+from .ticket_model import Ticket
+from .ticket_schema import TicketCreateSchema, TicketUpdateSchema
 
 
 class TicketService:
@@ -51,6 +51,7 @@ class TicketService:
 
         session.add(new_ticket)
         session.commit()
+        session.refresh(new_ticket)
 
         return new_ticket
 
@@ -66,6 +67,7 @@ class TicketService:
             setattr(ticket_to_update, field, value)
 
         session.commit()
+        session.refresh(ticket_to_update)
 
         return ticket_to_update
 

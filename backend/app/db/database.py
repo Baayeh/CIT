@@ -5,9 +5,9 @@ from sqlalchemy.engine import URL
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import get_settings
-from app.models.auth_model import User  # noqa: F401
-from app.models.customer_model import Customer  # noqa: F401
-from app.models.ticket_model import Ticket  # noqa: F401
+from app.features.auth.auth_model import User  # noqa: F401
+from app.features.customers.customer_model import Customer  # noqa: F401
+from app.features.tickets.ticket_model import Ticket  # noqa: F401
 
 settings = get_settings()
 
