@@ -1,9 +1,12 @@
 from datetime import datetime
+from typing import List
 from uuid import UUID, uuid4
 
 import sqlalchemy.dialects.postgresql as pg
 from pydantic import EmailStr
-from sqlmodel import Column, Field, SQLModel
+from sqlmodel import Column, Field, Relationship, SQLModel
+
+from app.models import ticket_model
 
 
 class User(SQLModel, table=True):
@@ -26,6 +29,9 @@ class User(SQLModel, table=True):
     )
     updated_at: datetime = Field(
         sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now)
+    )
+    tickets: List["ticket_model.Ticket"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
     )
 
     def __repr__(self):
