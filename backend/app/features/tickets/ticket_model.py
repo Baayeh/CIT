@@ -1,11 +1,13 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
 
 import sqlalchemy.dialects.postgresql as pg
 from sqlmodel import Column, Field, Relationship, SQLModel
 
-from app.features.auth import auth_model
+if TYPE_CHECKING:
+    from ..auth.auth_model import User
+    from ..customers.customer_model import Customer
 
 
 class Ticket(SQLModel, table=True):
@@ -22,7 +24,6 @@ class Ticket(SQLModel, table=True):
         )
     )
     title: str
-    user_id: UUID = Field(foreign_key="users.id")
     description: Optional[str] = Field(
         sa_column=Column(pg.TEXT, nullable=True, default=None)
     )
@@ -38,4 +39,18 @@ class Ticket(SQLModel, table=True):
     updated_at: datetime = Field(
         sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now)
     )
-    user: "auth_model.User" = Relationship(back_populates="tickets")
+
+    owner_id: UUID = Field(foreign_key="users.id", ondelete="RESTRICT")
+    customer_id: UUID = Field(foreign_key="customers.id", ondelete="RESTRICT")
+
+    creator: "User" = Relationship(back_populates="created_tickets")
+    # assignee: "User" = Relationship(back_populates="assigned_tickets")
+
+    customer: "Customer" = Relationship(back_populates="tickets")
+
+
+# event listener to assign ticket to current user if not set
+# @event.listens_for(Ticket, "before_insert")
+# def set_default_assign_to(mapper, connection, target):
+#     if target.assign_to is None:
+#         target.assign_to = target.owner_id
