@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, desc, select
 
 from .ticket_model import Ticket
-from .ticket_schema import TicketCreateSchema, TicketUpdateSchema
+from .ticket_schema import TicketCreate, TicketUpdate
 
 
 class TicketService:
@@ -17,7 +17,7 @@ class TicketService:
         """Retrieve all tickets created by current user"""
         statement = (
             select(Ticket)
-            .where(Ticket.user_id == user_id)
+            .where(Ticket.owner_id == user_id)
             .order_by(desc(Ticket.created_at))
         )
         result = session.exec(statement)
@@ -35,19 +35,17 @@ class TicketService:
         if not ticket:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="TIcket was not found",
+                detail="Ticket was not found",
             )
 
         return ticket
 
-    def create_ticket(
-        self, ticket_data: TicketCreateSchema, user_id: str, session: Session
-    ):
+    def create_ticket(self, ticket_data: TicketCreate, user_id: str, session: Session):
         """Create a new ticket record in the database"""
         ticket_data_dict = ticket_data.model_dump()
 
         new_ticket = Ticket(**ticket_data_dict)
-        new_ticket.user_id = user_id
+        new_ticket.owner_id = user_id
 
         session.add(new_ticket)
         session.commit()
@@ -56,7 +54,7 @@ class TicketService:
         return new_ticket
 
     def update_ticket(
-        self, ticket_id: str, update_data: TicketUpdateSchema, session: Session
+        self, ticket_id: str, update_data: TicketUpdate, session: Session
     ):
         """Update the details of a ticket"""
         ticket_to_update = self.get_ticket(ticket_id, session)

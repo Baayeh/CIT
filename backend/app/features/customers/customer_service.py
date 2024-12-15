@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, desc, select
 
 from .customer_model import Customer
-from .customer_schema import CustomerCreateSchema, CustomerUpdateSchema
+from .customer_schema import CustomerCreate, CustomerUpdate
 
 
 class CustomerService:
@@ -29,7 +29,7 @@ class CustomerService:
 
         return customer
 
-    def create_customer(self, customer_data: CustomerCreateSchema, session: Session):
+    def create_customer(self, customer_data: CustomerCreate, session: Session):
         """Create a new customer record in the database"""
         customer_data_dict = customer_data.model_dump()
 
@@ -40,7 +40,7 @@ class CustomerService:
         return new_customer
 
     def update_customer(
-        self, customer_id: str, update_data: CustomerUpdateSchema, session: Session
+        self, customer_id: str, update_data: CustomerUpdate, session: Session
     ):
         """Update the details of a customer"""
         customer_to_update = self.get_customer(customer_id, session)
