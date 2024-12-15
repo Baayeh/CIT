@@ -6,9 +6,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.db.database import SessionDep
 from app.db.redis import token_in_blocklist
-from app.features.auth.auth_model import User
 from app.features.auth.auth_service import AuthService
 from app.features.auth.auth_utils import decode_token
+
+from .auth_model import User
 
 service = AuthService()
 
