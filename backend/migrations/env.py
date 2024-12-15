@@ -2,9 +2,13 @@ from logging.config import fileConfig
 
 from alembic import context
 from app.core.config import get_settings
+
+# import DB models
 from app.features.auth.auth_model import User  # noqa: F401
 from app.features.customers.customer_model import Customer  # noqa: F401
 from app.features.tickets.ticket_model import Ticket  # noqa: F401
+
+# sqlalchemy & sqlmodel imports
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
