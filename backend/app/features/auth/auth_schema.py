@@ -1,36 +1,40 @@
-from datetime import datetime
-from typing import List
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import EmailStr, Field
+from sqlmodel import SQLModel
 
-from ..tickets.ticket_schema import TicketDetailSchema
+from app.common.shared_schemas import TicketPublic, UserPublic
 
 
-class UserDetailSchema(BaseModel):
+class UserBase(SQLModel):
+    firstname: str
+    lastname: str
+    username: str
+    email: EmailStr
+
+
+class UserCreate(UserBase):
+    password: str = Field(min_length=8)
+
+    model_config = {"extra": "forbid"}
+
+
+class UserUpdate(SQLModel):
     id: UUID
     firstname: str
     lastname: str
     username: str
     role: str
     email: EmailStr
-    is_verified: bool
-    created_at: datetime
-    updated_at: datetime
-    tickets: List[TicketDetailSchema]
-
-
-class UserCreateSchema(BaseModel):
-    firstname: str = Field(min_length=3, max_length=25)
-    lastname: str = Field(min_length=3, max_length=25)
-    username: str = Field(min_length=5, max_length=25)
-    email: EmailStr
     password: str = Field(min_length=8)
 
-    model_config = {"extra": "forbid"}
+
+class UserPublicWithTickets(UserPublic):
+    created_tickets: list["TicketPublic"] = []
+    # assigned_tickets: list["TicketPublic"] = []
 
 
-class UserLoginSchema(BaseModel):
+class UserLogin(SQLModel):
     email: EmailStr
     password: str = Field(min_length=8)
 

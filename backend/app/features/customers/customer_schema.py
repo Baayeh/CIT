@@ -1,21 +1,26 @@
-from datetime import datetime
-from uuid import UUID
+from typing import TYPE_CHECKING
 
-from pydantic import BaseModel
+from sqlmodel import SQLModel
 
+from app.common.shared_schemas import CustomerPublic
 
-class CustomerDetailsSchema(BaseModel):
-    id: UUID
-    name: str
-    phone_number: str
-    created_at: datetime
-    updated_at: datetime
+if TYPE_CHECKING:
+    from ..tickets.ticket_schema import TicketPublic
 
 
-class CustomerCreateSchema(BaseModel):
+class CustomerBase(SQLModel):
     name: str
     phone_number: str
 
 
-class CustomerUpdateSchema(CustomerCreateSchema):
+class CustomerPublicWithTickets(CustomerPublic):
+    tickets: list["TicketPublic"] = []
+
+
+class CustomerCreate(CustomerBase):
+    name: str
+    phone_number: str
+
+
+class CustomerUpdate(CustomerBase):
     pass
