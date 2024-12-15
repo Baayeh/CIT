@@ -13,9 +13,10 @@ from .auth_dependencies import (
     get_current_user,
 )
 from .auth_schema import (
-    UserCreateSchema,
-    UserDetailSchema,
-    UserLoginSchema,
+    UserCreate,
+    UserLogin,
+    UserPublic,
+    UserPublicWithTickets,
 )
 from .auth_service import AuthService
 from .auth_utils import create_access_token, verify_passwd
@@ -30,17 +31,15 @@ AccessTokenDep = Depends(AccessTokenBearer())
 RefreshTokenDep = Depends(RefreshTokenBearer())
 
 
-@router.post(
-    "/signup", response_model=UserDetailSchema, status_code=status.HTTP_201_CREATED
-)
-async def create_user_account(user_data: UserCreateSchema, session: SessionDep):
+@router.post("/signup", response_model=UserPublic, status_code=status.HTTP_201_CREATED)
+async def create_user_account(user_data: UserCreate, session: SessionDep):
     new_user = service.create_user(user_data, session)
 
     return new_user
 
 
 @router.post("/login")
-async def login_user(login_data: UserLoginSchema, session: SessionDep):
+async def login_user(login_data: UserLogin, session: SessionDep):
     email = login_data.email
     password = login_data.password
 
@@ -116,7 +115,7 @@ async def get_new_access_token(token_details: dict = RefreshTokenDep):
     )
 
 
-@router.get("/me", response_model=UserDetailSchema)
+@router.get("/me", response_model=UserPublicWithTickets)
 async def get_current_user(
     user=Depends(get_current_user), _: bool = Depends(role_checker)
 ):

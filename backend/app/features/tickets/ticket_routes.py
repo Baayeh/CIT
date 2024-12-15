@@ -3,12 +3,13 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.db.database import SessionDep
-from app.features.auth.auth_dependencies import AccessTokenBearer, RoleChecker
 
+from ..auth.auth_dependencies import AccessTokenBearer, RoleChecker
 from .ticket_schema import (
-    TicketCreateSchema,
-    TicketDetailSchema,
-    TicketUpdateSchema,
+    TicketCreate,
+    TicketPublic,
+    TicketPublicWithOwnerAndCustomer,
+    TicketUpdate,
 )
 from .ticket_service import TicketService
 
@@ -26,7 +27,7 @@ TokenDep = Depends(AccessTokenBearer())
 
 @router.get(
     "/",
-    response_model=List[TicketDetailSchema],
+    response_model=List[TicketPublic],
     status_code=status.HTTP_200_OK,
     dependencies=[admin_checker],
 )
@@ -39,7 +40,7 @@ async def get_all_tickets(session: SessionDep, token_details: dict = TokenDep):
 
 @router.get(
     "/user/{user_id}",
-    response_model=List[TicketDetailSchema],
+    response_model=List[TicketPublic],
     status_code=status.HTTP_200_OK,
     dependencies=[universal_checker],
 )
@@ -54,12 +55,12 @@ async def get_tickets_by_user(
 
 @router.post(
     "/",
-    response_model=TicketDetailSchema,
+    response_model=TicketPublic,
     status_code=status.HTTP_201_CREATED,
     dependencies=[universal_checker],
 )
 async def create_ticket(
-    ticket_data: TicketCreateSchema,
+    ticket_data: TicketCreate,
     session: SessionDep,
     token_details: dict = TokenDep,
 ) -> dict:
@@ -73,7 +74,7 @@ async def create_ticket(
 
 @router.get(
     "/{ticket_id}",
-    response_model=TicketDetailSchema,
+    response_model=TicketPublicWithOwnerAndCustomer,
     status_code=status.HTTP_200_OK,
     dependencies=[universal_checker],
 )
@@ -89,13 +90,13 @@ async def get_ticket(
 
 @router.put(
     "/{ticket_id}",
-    response_model=TicketDetailSchema,
+    response_model=TicketPublic,
     status_code=status.HTTP_200_OK,
     dependencies=[universal_checker],
 )
 async def update_ticket(
     ticket_id: str,
-    ticket_data: TicketUpdateSchema,
+    ticket_data: TicketUpdate,
     session: SessionDep,
     token_details: dict = TokenDep,
 ):
