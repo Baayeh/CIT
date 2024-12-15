@@ -1,8 +1,12 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 import sqlalchemy.dialects.postgresql as pg
-from sqlmodel import Column, Field, SQLModel
+from sqlmodel import Column, Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from ..tickets.ticket_model import Ticket
 
 
 class Customer(SQLModel, table=True):
@@ -18,6 +22,11 @@ class Customer(SQLModel, table=True):
     )
     updated_at: datetime = Field(
         sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now)
+    )
+    tickets: list["Ticket"] = Relationship(
+        back_populates="customer",
+        passive_deletes="all",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
     def __repr__(self):
