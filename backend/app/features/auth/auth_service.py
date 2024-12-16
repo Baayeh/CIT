@@ -3,6 +3,8 @@ import logging
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
+from app.utils.api_exceptions import UserAlreadyExists
+
 from .auth_model import User
 from .auth_schema import UserCreate
 from .auth_utils import generate_passwd_hash
@@ -35,10 +37,7 @@ class AuthService:
 
     def create_user(self, user_data: UserCreate, session: Session):
         if self.user_exists(user_data.email, session):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="User with email already exists",
-            )
+            raise UserAlreadyExists()
 
         # Prepare user data
         user_data_dict = user_data.model_dump()

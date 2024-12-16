@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from app.db.database import SessionDep
 from app.db.redis import add_jti_to_blocklist
+from app.utils.api_exceptions import InvalidCredentials, InvalidToken
 
 from .auth_dependencies import (
     AccessTokenBearer,
@@ -47,15 +48,11 @@ async def login_user(login_data: UserLogin, session: SessionDep):
     user = service.get_user_by_email(email, session)
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid email or password"
-        )
+        raise InvalidCredentials()
 
     # Validate the password
     if not verify_passwd(password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid email or password"
-        )
+        raise InvalidCredentials()
 
     # Generate access and refresh tokens
     access_token = create_access_token(
@@ -110,9 +107,7 @@ async def get_new_access_token(token_details: dict = RefreshTokenDep):
         new_access_token = create_access_token(user_data=token_details["user"])
 
         return JSONResponse(content={"access_token": new_access_token})
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
-    )
+    raise InvalidToken()
 
 
 @router.get("/me", response_model=UserPublicWithTickets)

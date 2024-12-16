@@ -27,7 +27,7 @@ TokenDep = Depends(AccessTokenBearer())
 
 @router.get(
     "/",
-    response_model=List[TicketPublic],
+    response_model=List[TicketPublicWithOwnerAndCustomer],
     status_code=status.HTTP_200_OK,
     dependencies=[admin_checker],
 )

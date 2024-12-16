@@ -6,6 +6,8 @@ from app.db.database import engine, init_db
 from app.features.auth import auth_routes
 from app.features.customers import customer_routes
 from app.features.tickets import ticket_routes
+from app.utils.api_exceptions import register_all_errors
+from app.utils.middleware import register_middleware
 
 
 @asynccontextmanager
@@ -19,7 +21,15 @@ async def lifespan(app: FastAPI):
 
 version = "v1"
 
-app = FastAPI(version=version)
+app = FastAPI(
+    title="Customer Issues Tracker (CIT)",
+    description="A REST API for creating and managing customer tickets",
+    version=version,
+)
+
+register_all_errors(app)
+register_middleware(app)
+
 
 app.include_router(auth_routes.router, prefix=f"/api/{version}/auth", tags=["auth"])
 app.include_router(
