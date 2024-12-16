@@ -45,7 +45,7 @@ class TicketService:
         ticket_data_dict = ticket_data.model_dump()
 
         new_ticket = Ticket(**ticket_data_dict)
-        new_ticket.owner_id = user_id
+        new_ticket.creator_id = user_id
 
         session.add(new_ticket)
         session.commit()

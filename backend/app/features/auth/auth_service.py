@@ -46,7 +46,6 @@ class AuthService:
 
         # hash the password
         new_user.password_hash = generate_passwd_hash(user_data_dict["password"])
-        new_user.role = "user"
 
         # add and commit the user
         try:
