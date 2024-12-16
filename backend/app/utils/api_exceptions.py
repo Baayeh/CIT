@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any
 
 from fastapi import FastAPI, status
 from fastapi.requests import Request
@@ -83,11 +83,15 @@ class UserNotFound(CustomerNotFound):
     pass
 
 
-def create_exception_handler(
-    status_code: int, initial_detail: Any
-) -> Callable[[Request, Exception], JSONResponse]:
-    async def exception_handler(request: Request, exc: CustomException):
-        return JSONResponse(content=initial_detail, status_code=status_code)
+def create_exception_handler(status_code: int, initial_detail: Any):
+    async def exception_handler(request: Request, exc):
+        return JSONResponse(
+            content={
+                "message": initial_detail.get("message"),
+                "error_code": initial_detail.get("error_code"),
+            },
+            status_code=status_code,
+        )
 
     return exception_handler
 
@@ -98,8 +102,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "Token is invalid or expired",
-                "error_code": "invalid_token",
+                "message": "The token is invalid or has expired.",
+                "error_code": "INVALID_TOKEN",
             },
         ),
     )
@@ -109,8 +113,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "Token provided has been revoked",
-                "error_code": "token_revoked",
+                "message": "The token provided has been revoked.",
+                "error_code": "TOKEN_REVOKED",
             },
         ),
     )
@@ -120,8 +124,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "Please provide a valid access token",
-                "error_code": "access_token_required",
+                "message": "Access token is required to access this resource.",
+                "error_code": "ACCESS_TOKEN_REQUIRED",
             },
         ),
     )
@@ -131,8 +135,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "Please provide a valid refresh token",
-                "error_code": "rtefresh_token_required",
+                "message": "A refresh token is required to proceed.",
+                "error_code": "REFRESH_TOKEN_REQUIRED",
             },
         ),
     )
@@ -142,8 +146,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "User with email already exists",
-                "error_code": "user_exists",
+                "message": "A user with this email address already exists.",
+                "error_code": "USER_EXISTS",
             },
         ),
     )
@@ -153,8 +157,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_400_BAD_REQUEST,
             initial_detail={
-                "message": "Invalid email or password",
-                "error_code": "invalid_email_or_password)",
+                "message": "Invalid email or password provided.",
+                "error_code": "INVALID_EMAIL_OR_PASSWORD",
             },
         ),
     )
@@ -164,8 +168,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_401_UNAUTHORIZED,
             initial_detail={
-                "message": "You don not have permission to perform this action",
-                "error_code": "insufficient_permission",
+                "message": "You do not have the required permissions to perform this action.",
+                "error_code": "INSUFFICIENT_PERMISSION",
             },
         ),
     )
@@ -175,8 +179,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_404_NOT_FOUND,
             initial_detail={
-                "message": "Ticket not found",
-                "error_code": "ticket_not_found",
+                "message": "The specified ticket could not be found.",
+                "error_code": "TICKET_NOT_FOUND",
             },
         ),
     )
@@ -186,8 +190,8 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_404_NOT_FOUND,
             initial_detail={
-                "message": "Customer not found",
-                "error_code": "customer_not_found",
+                "message": "The specified customer could not be found.",
+                "error_code": "CUSTOMER_NOT_FOUND",
             },
         ),
     )
@@ -197,15 +201,24 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_404_NOT_FOUND,
             initial_detail={
-                "message": "User not found",
-                "error_code": "user_not_found",
+                "message": "The specified user could not be found.",
+                "error_code": "USER_NOT_FOUND",
             },
         ),
     )
 
+    # Global exception handler for 500 - Internal Server Error
     @app.exception_handler(500)
     async def internal_server_error(request, exc):
         return JSONResponse(
-            content={"message": "Something went wrong", "error_code": "server_error"},
+            content={
+                "error": {
+                    "code": "SERVER_ERROR",
+                    "message": "An unexpected error occurred on the server.",
+                },
+                "details": {
+                    "resolution": "Please try again later or contact support if the issue persists.",
+                },
+            },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
