@@ -21,3 +21,24 @@ def register_middleware(app: FastAPI):
         print(message)
 
         return response
+
+    @app.middleware("http")
+    async def check_authorization_header(request: Request, call_next):
+        if "Authorization" not in request.headers:
+            return JSONResponse(
+                content={
+                    "error": {
+                        "code": "AUTHENTICATION_FAILED",
+                        "message": "Authorization header is missing.",
+                    },
+                    "details": {
+                        "resolution": "Include a valid token in the 'Authorization' header to access this resource.",
+                        "example": {"header": "Authorization: Bearer <your-token>"},
+                    },
+                },
+                status_code=401,  # HTTP status for unauthorized access
+            )
+
+        response = await call_next(request)
+
+        return response
