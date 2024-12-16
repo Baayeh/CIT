@@ -1,10 +1,13 @@
-from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
 from sqlmodel import SQLModel
 
-from app.common.shared_schemas import CustomerPublic, TicketPublic, UserPublic
+from app.common.shared_schemas import (
+    CustomerTicketPublic,
+    TicketPublic,
+    UserTicketPublic,
+)
 
 
 class TicketBase(SQLModel):
@@ -15,7 +18,8 @@ class TicketBase(SQLModel):
 
 
 class TicketCreate(TicketBase):
-    pass
+    owner_id: UUID
+    customer_id: UUID
 
 
 class TicketUpdate(TicketBase):
@@ -23,5 +27,6 @@ class TicketUpdate(TicketBase):
 
 
 class TicketPublicWithOwnerAndCustomer(TicketPublic):
-    creator: UserPublic
-    customer: CustomerPublic
+    creator: UserTicketPublic
+    customer: CustomerTicketPublic
+    owner: UserTicketPublic
