@@ -34,7 +34,15 @@ class User(SQLModel, table=True):
     created_tickets: list["Ticket"] = Relationship(
         back_populates="creator",
         cascade_delete=True,
-        sa_relationship_kwargs={"lazy": "selectin"},
+        sa_relationship_kwargs={
+            "lazy": "selectin",
+            "foreign_keys": "Ticket.creator_id",
+        },
+    )
+    assigned_tickets: list["Ticket"] = Relationship(
+        back_populates="owner",
+        cascade_delete=True,
+        sa_relationship_kwargs={"lazy": "selectin", "foreign_keys": "Ticket.owner_id"},
     )
 
     def __repr__(self):

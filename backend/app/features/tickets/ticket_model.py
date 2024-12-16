@@ -39,13 +39,30 @@ class Ticket(SQLModel, table=True):
     updated_at: datetime = Field(
         sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now)
     )
+    assigned_at: Optional[datetime] = Field(
+        sa_column=Column(pg.TIMESTAMP, nullable=True, default=None)
+    )
 
-    owner_id: UUID = Field(foreign_key="users.id", ondelete="RESTRICT")
-    customer_id: UUID = Field(foreign_key="customers.id", ondelete="RESTRICT")
+    # FOREIGN KEYS
+    creator_id: UUID = Field(foreign_key="users.id", ondelete="RESTRICT", index=True)
+    owner_id: UUID = Field(foreign_key="users.id", ondelete="RESTRICT", index=True)
+    customer_id: UUID = Field(
+        foreign_key="customers.id", ondelete="RESTRICT", index=True
+    )
 
-    creator: "User" = Relationship(back_populates="created_tickets")
-    # assignee: "User" = Relationship(back_populates="assigned_tickets")
-
+    # RELATIONSHIPS
+    creator: "User" = Relationship(
+        sa_relationship_kwargs={
+            "foreign_keys": "Ticket.creator_id",
+            "back_populates": "created_tickets",
+        }
+    )
+    owner: "User" = Relationship(
+        sa_relationship_kwargs={
+            "foreign_keys": "Ticket.owner_id",
+            "back_populates": "assigned_tickets",
+        }
+    )
     customer: "Customer" = Relationship(back_populates="tickets")
 
 
