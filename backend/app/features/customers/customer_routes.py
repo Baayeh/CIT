@@ -3,9 +3,15 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 
 from app.db.database import SessionDep
-from app.dependencies.auth_dependencies import AccessTokenBearer, RoleChecker
-from app.schemas.customer_schema import CustomerCreateSchema, CustomerDetailsSchema
-from app.services.customer_service import CustomerService
+
+from ..auth.auth_dependencies import AccessTokenBearer, RoleChecker
+from .customer_schema import (
+    CustomerCreate,
+    CustomerPublic,
+    CustomerPublicWithTickets,
+    CustomerUpdate,
+)
+from .customer_service import CustomerService
 
 # role checkers
 universal_checker = Depends(RoleChecker(["admin", "user"]))
@@ -21,7 +27,7 @@ TokenDep = Depends(AccessTokenBearer())
 
 @router.get(
     "/",
-    response_model=List[CustomerDetailsSchema],
+    response_model=List[CustomerPublic],
     status_code=status.HTTP_200_OK,
     dependencies=[universal_checker],
 )
@@ -34,12 +40,12 @@ async def get_all_customers(session: SessionDep, token_details=TokenDep):
 
 @router.post(
     "/",
-    response_model=CustomerDetailsSchema,
+    response_model=CustomerPublic,
     status_code=status.HTTP_201_CREATED,
     dependencies=[universal_checker],
 )
 async def create_customer(
-    customer_data: CustomerCreateSchema,
+    customer_data: CustomerCreate,
     session: SessionDep,
     token_details=TokenDep,
 ):
@@ -50,7 +56,7 @@ async def create_customer(
 
 @router.get(
     "/{customer_id}",
-    response_model=CustomerDetailsSchema,
+    response_model=CustomerPublicWithTickets,
     status_code=status.HTTP_200_OK,
     dependencies=[universal_checker],
 )
@@ -66,13 +72,13 @@ async def get_customer(
 
 @router.put(
     "/{customer_id}",
-    response_model=CustomerDetailsSchema,
+    response_model=CustomerPublic,
     status_code=status.HTTP_200_OK,
     dependencies=[universal_checker],
 )
 async def update_customer(
     customer_id: str,
-    customer_data: CustomerCreateSchema,
+    customer_data: CustomerUpdate,
     session: SessionDep,
     token_details=TokenDep,
 ):

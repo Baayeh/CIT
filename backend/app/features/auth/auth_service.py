@@ -3,9 +3,9 @@ import logging
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from app.models.auth_model import User
-from app.schemas.auth_schema import UserCreateSchema
-from app.utils.auth_utils import generate_passwd_hash
+from .auth_model import User
+from .auth_schema import UserCreate
+from .auth_utils import generate_passwd_hash
 
 
 class AuthService:
@@ -33,7 +33,7 @@ class AuthService:
         user = self.get_user_by_email(email, session)
         return user is not None
 
-    def create_user(self, user_data: UserCreateSchema, session: Session):
+    def create_user(self, user_data: UserCreate, session: Session):
         if self.user_exists(user_data.email, session):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -46,7 +46,6 @@ class AuthService:
 
         # hash the password
         new_user.password_hash = generate_passwd_hash(user_data_dict["password"])
-        new_user.role = "user"
 
         # add and commit the user
         try:

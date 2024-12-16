@@ -1,13 +1,15 @@
 from typing import List
 
-from app.db.database import SessionDep
-from app.db.redis import token_in_blocklist
-from app.models.auth_model import User
-from app.services.auth_service import AuthService
-from app.utils.auth_utils import decode_token
 from fastapi import Depends, Request, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from app.db.database import SessionDep
+from app.db.redis import token_in_blocklist
+from app.features.auth.auth_service import AuthService
+from app.features.auth.auth_utils import decode_token
+
+from .auth_model import User
 
 service = AuthService()
 
