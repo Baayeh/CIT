@@ -1,5 +1,6 @@
-from fastapi import HTTPException, status
 from sqlmodel import Session, desc, select
+
+from app.utils.api_exceptions import CustomerNotFound
 
 from .customer_model import Customer
 from .customer_schema import CustomerCreate, CustomerUpdate
@@ -22,10 +23,7 @@ class CustomerService:
         customer = result.first()
 
         if not customer:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Customer was not found",
-            )
+            raise CustomerNotFound()
 
         return customer
 

@@ -17,7 +17,7 @@ url_obj = URL.create(
     database=settings.db.name,
 )
 
-engine = create_engine(url=url_obj, echo=True)
+engine = create_engine(url=url_obj)
 
 
 def init_db():

@@ -19,7 +19,9 @@ class TicketBase(SQLModel):
 
 class TicketCreate(TicketBase):
     owner_id: UUID
-    customer_id: UUID
+    customer_id: Optional[UUID] = None
+    customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
 
 
 class TicketUpdate(TicketBase):
