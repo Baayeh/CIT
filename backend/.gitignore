@@ -11,3 +11,5 @@
 /migrations/*/__pycache__/
 /app/features/__pycache__/
 /app/features/*/__pycache__/
+
+.idea

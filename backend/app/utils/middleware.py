@@ -24,7 +24,9 @@ def register_middleware(app: FastAPI):
 
     @app.middleware("http")
     async def check_authorization_header(request: Request, call_next):
-        if "Authorization" not in request.headers:
+        login_path = "/api/v1/auth/login"
+
+        if request.url.path != login_path and "Authorization" not in request.headers:
             return JSONResponse(
                 content={
                     "error": {
